@@ -8,8 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class UnitOfMeasure {
     @Id

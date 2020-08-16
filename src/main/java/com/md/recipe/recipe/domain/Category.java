@@ -1,16 +1,13 @@
 package com.md.recipe.recipe.domain;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Setter
-@Getter
+@Data
+@EqualsAndHashCode(exclude = {"recipes"})
 @NoArgsConstructor
 public class Category {
     @Id
