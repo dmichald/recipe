@@ -1,5 +1,6 @@
 package com.md.recipe.recipe.controllers;
 
+import com.md.recipe.recipe.command.RecipeCommand;
 import com.md.recipe.recipe.domain.Recipe;
 import com.md.recipe.recipe.services.RecipeService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,18 +25,33 @@ public class RecipeController {
         return "recipe/recipeView";
     }
 
-    @DeleteMapping({"recipe/{id}"})
-    void deleteRecipe(@PathVariable Long id){
-
+    @GetMapping
+    @RequestMapping("recipe/new")
+    String createRecipe(Model model) {
+        model.addAttribute("recipe", new RecipeCommand());
+        return "recipe/recipeform";
     }
 
     @PostMapping
-     Recipe addRecipe(@RequestParam Recipe recipe){
-        return null;
+    @RequestMapping("recipe")
+    String saveOrUpdate(@ModelAttribute RecipeCommand recipe) {
+        RecipeCommand newRecipe = recipeService.createRecipe(recipe);
+        return "redirect:/recipe/" + newRecipe.getId();
     }
 
-    @PutMapping
-    Recipe updateRecipe( @RequestParam Recipe recipe){
-        return null;
+    @GetMapping
+    @RequestMapping("recipe/{id}/update")
+    String updateRecipe(@PathVariable String id, Model model) {
+        model.addAttribute("recipe", recipeService.findCommandById(Long.valueOf(id)));
+        return "recipe/recipeform";
+    }
+
+    @GetMapping
+    @RequestMapping("recipe/{id}/delete")
+    String deleteRecipe(@PathVariable String id, Model model) {
+        recipeService.deleteRecipe(Long.valueOf(id));
+        log.debug("Delete recipe with id: " + id);
+
+        return "redirect:/";
     }
 }

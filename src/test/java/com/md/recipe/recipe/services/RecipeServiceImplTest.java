@@ -73,7 +73,6 @@ class RecipeServiceImplTest {
     @Test
     @DisplayName("delete recipe by given id")
     void deleteRecipe() {
-        doNothing().when(recipeRepository).deleteById(anyLong());
         recipeService.deleteRecipe(1L);
         verify(recipeRepository, times(1)).deleteById(anyLong());
     }
