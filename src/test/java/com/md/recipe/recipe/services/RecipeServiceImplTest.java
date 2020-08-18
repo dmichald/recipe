@@ -1,13 +1,13 @@
 package com.md.recipe.recipe.services;
 
+import com.md.recipe.recipe.converters.RecipeCommandToRecipe;
+import com.md.recipe.recipe.converters.RecipeToRecipeCommand;
 import com.md.recipe.recipe.domain.Recipe;
 import com.md.recipe.recipe.repositories.RecipeRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.HashSet;
@@ -19,15 +19,19 @@ import static org.mockito.Mockito.*;
 
 @DisplayName("RecipeServiceImpl should")
 class RecipeServiceImplTest {
-    RecipeServiceImpl recipeService;
+    @Mock
+    RecipeToRecipeCommand recipeToRecipeCommand;
 
     @Mock
     RecipeRepository recipeRepository;
+    @Mock
+    RecipeCommandToRecipe recipeCommandToRecipe;
+    private RecipeServiceImpl recipeService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        recipeService = new RecipeServiceImpl(recipeRepository);
+        recipeService = new RecipeServiceImpl(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
     }
 
     @Test
@@ -64,5 +68,13 @@ class RecipeServiceImplTest {
                 () -> recipeService.getRecipeById(anyLong())
         );
         assertTrue(thrown.getMessage().contains("Recipe not found"));
+    }
+
+    @Test
+    @DisplayName("delete recipe by given id")
+    void deleteRecipe() {
+        doNothing().when(recipeRepository).deleteById(anyLong());
+        recipeService.deleteRecipe(1L);
+        verify(recipeRepository, times(1)).deleteById(anyLong());
     }
 }
