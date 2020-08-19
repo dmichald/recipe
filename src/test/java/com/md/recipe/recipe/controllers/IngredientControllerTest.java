@@ -6,6 +6,7 @@ import com.md.recipe.recipe.services.IngredientService;
 import com.md.recipe.recipe.services.RecipeService;
 import com.md.recipe.recipe.services.UnitOfMeasureService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
@@ -124,5 +125,13 @@ class IngredientControllerTest {
                 .andExpect(model().attributeExists("ingredient"))
                 .andExpect(model().attributeExists("uomList"));
         verify(recipeService, times(1)).findCommandById(anyLong());
+    }
+
+
+    @Test
+    void testDeleteRecipe() throws Exception {
+        mockMvc.perform(get("/recipe/1/ingredient/2/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/recipe/1/ingredients"));
     }
 }

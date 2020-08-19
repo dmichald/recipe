@@ -25,29 +25,25 @@ public class RecipeController {
         return "recipe/recipeView";
     }
 
-    @GetMapping
-    @RequestMapping("recipe/new")
+    @GetMapping("recipe/new")
     String createRecipe(Model model) {
         model.addAttribute("recipe", new RecipeCommand());
         return "recipe/recipeform";
     }
 
-    @PostMapping
-    @RequestMapping("recipe")
+    @PostMapping("recipe")
     String saveOrUpdate(@ModelAttribute RecipeCommand recipe) {
         RecipeCommand newRecipe = recipeService.createRecipe(recipe);
         return "redirect:/recipe/" + newRecipe.getId();
     }
 
-    @GetMapping
-    @RequestMapping("recipe/{id}/update")
+    @GetMapping("recipe/{id}/update")
     String updateRecipe(@PathVariable String id, Model model) {
         model.addAttribute("recipe", recipeService.findCommandById(Long.valueOf(id)));
         return "recipe/recipeform";
     }
 
-    @GetMapping
-    @RequestMapping("recipe/{id}/delete")
+    @GetMapping("recipe/{id}/delete")
     String deleteRecipe(@PathVariable String id, Model model) {
         recipeService.deleteRecipe(Long.valueOf(id));
         log.debug("Delete recipe with id: " + id);
