@@ -6,13 +6,20 @@ import com.md.recipe.recipe.services.RecipeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.validation.Valid;
 
 @Controller
 @Slf4j
 public class RecipeController {
 
-    private RecipeService recipeService;
+    private final RecipeService recipeService;
+    private static final String RECIPE_RECIPEFORM_URL = "recipe/recipeform";
 
     public RecipeController(RecipeService recipeService) {
         this.recipeService = recipeService;
@@ -28,11 +35,15 @@ public class RecipeController {
     @GetMapping("recipe/new")
     String createRecipe(Model model) {
         model.addAttribute("recipe", new RecipeCommand());
-        return "recipe/recipeform";
+        return RECIPE_RECIPEFORM_URL;
     }
 
     @PostMapping("recipe")
-    String saveOrUpdate(@ModelAttribute RecipeCommand recipe) {
+    String saveOrUpdate(@Valid @ModelAttribute("recipe") RecipeCommand recipe, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            return RECIPE_RECIPEFORM_URL;
+        }
         RecipeCommand newRecipe = recipeService.createRecipe(recipe);
         return "redirect:/recipe/" + newRecipe.getId();
     }

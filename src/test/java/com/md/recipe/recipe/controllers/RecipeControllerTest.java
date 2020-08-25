@@ -2,6 +2,8 @@ package com.md.recipe.recipe.controllers;
 
 import com.md.recipe.recipe.command.RecipeCommand;
 import com.md.recipe.recipe.domain.Recipe;
+import com.md.recipe.recipe.exceptions.ControllerAdvisor;
+import com.md.recipe.recipe.exceptions.NotFoundException;
 import com.md.recipe.recipe.services.RecipeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +29,9 @@ class RecipeControllerTest {
     void setUp() {
         recipeService = mock(RecipeService.class);
         recipeController = new RecipeController(recipeService);
-        mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(recipeController)
+                .setControllerAdvice(new ControllerAdvisor())
+                .build();
     }
 
 
@@ -59,7 +63,11 @@ class RecipeControllerTest {
 
         when(recipeService.createRecipe(any())).thenReturn(recipeCommand);
         mockMvc.perform(post("/recipe")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .param("id","")
+        .param("description", "this is description")
+        .param("directions", "some directions")
+        .param("url","https://www.example.com"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/recipe/1"));
     }
@@ -83,5 +91,30 @@ class RecipeControllerTest {
                 .andExpect(view().name("redirect:/"));
 
         verify(recipeService,times(1)).deleteRecipe(anyLong());
+    }
+
+    @Test
+    void shouldThrowExceptionNotFound() throws Exception {
+        when(recipeService.getRecipeById(anyLong())).thenThrow(NotFoundException.class);
+        mockMvc.perform(get("/recipe/34"))
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("errors/404error"));
+
+    }
+
+    @Test
+    void testNewRecipeFormValidation() throws Exception {
+        RecipeCommand recipeCommand = new RecipeCommand();
+        recipeCommand.setId(1L);
+
+        when(recipeService.createRecipe(any())).thenReturn(recipeCommand);
+
+        mockMvc.perform(post("/recipe")
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .param("id",""))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("recipe"))
+                .andExpect(view().name("recipe/recipeform"));
+
     }
 }
