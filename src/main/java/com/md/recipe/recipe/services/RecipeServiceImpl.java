@@ -4,6 +4,7 @@ import com.md.recipe.recipe.command.RecipeCommand;
 import com.md.recipe.recipe.converters.RecipeCommandToRecipe;
 import com.md.recipe.recipe.converters.RecipeToRecipeCommand;
 import com.md.recipe.recipe.domain.Recipe;
+import com.md.recipe.recipe.exceptions.NotFoundException;
 import com.md.recipe.recipe.repositories.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public Recipe getRecipeById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Recipe not found"));
+                .orElseThrow(() -> new NotFoundException("Recipe not found"));
     }
 
     @Transactional
@@ -50,6 +51,12 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public RecipeCommand updateRecipe(RecipeCommand recipe) {
         return null;
+    }
+
+    @Transactional
+    @Override
+    public RecipeCommand findCommandById(Long id) {
+        return recipeToRecipeCommand.convert(getRecipeById(id));
     }
 
     @Override

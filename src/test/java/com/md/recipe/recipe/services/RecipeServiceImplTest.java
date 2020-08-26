@@ -3,6 +3,7 @@ package com.md.recipe.recipe.services;
 import com.md.recipe.recipe.converters.RecipeCommandToRecipe;
 import com.md.recipe.recipe.converters.RecipeToRecipeCommand;
 import com.md.recipe.recipe.domain.Recipe;
+import com.md.recipe.recipe.exceptions.NotFoundException;
 import com.md.recipe.recipe.repositories.RecipeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -77,4 +78,16 @@ class RecipeServiceImplTest {
         recipeService.deleteRecipe(1L);
         verify(recipeRepository, times(1)).deleteById(anyLong());
     }
+
+    @Test
+    @DisplayName("throw NotFoundException when not found recipe")
+    void testException() {
+        Optional<Recipe> optionalRecipe = Optional.empty();
+        when(recipeRepository.findById(anyLong())).thenReturn(optionalRecipe);
+        Throwable throwable = assertThrows(NotFoundException.class, () -> recipeService.getRecipeById(1L));
+
+        assertEquals("Recipe not found", throwable.getMessage());
+    }
+
+
 }
